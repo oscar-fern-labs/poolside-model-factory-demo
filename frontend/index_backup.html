@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏭 Poolside Model Factory - Enhanced Interactive Demo with LLM Chat</title>
+    <title>🏭 Poolside Model Factory - Interactive Demo</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -530,162 +530,6 @@
 
     <script>
         const API_BASE = 'https://backend-morphvm-1y1tpw5s.http.cloud.morph.so/api';
-
-        // Enhanced dashboard loading with more metrics
-        async function loadEnhancedMetrics() {
-            try {
-                const response = await fetch(`${API_BASE}/api/metrics/performance`);
-                const metrics = await response.json();
-                
-                // Add enhanced metrics cards
-                const dashboardGrid = document.querySelector('.dashboard-grid');
-                if (dashboardGrid) {
-                    // Add Titan metrics card
-                    const titanCard = document.createElement('div');
-                    titanCard.className = 'metric-card';
-                    titanCard.innerHTML = `
-                        <h3><i class="fas fa-fire"></i> Titan Training</h3>
-                        <div class="metric-value">${metrics.titan_metrics.avg_throughput_tokens_per_sec}</div>
-                        <div class="metric-label">Tokens/sec throughput</div>
-                    `;
-                    
-                    // Add Atlas metrics card  
-                    const atlasCard = document.createElement('div');
-                    atlasCard.className = 'metric-card';
-                    atlasCard.innerHTML = `
-                        <h3><i class="fas fa-bolt"></i> Atlas Inference</h3>
-                        <div class="metric-value">${metrics.atlas_metrics.inference_requests_per_sec}</div>
-                        <div class="metric-label">Requests/sec</div>
-                    `;
-                    
-                    // Insert after existing cards
-                    dashboardGrid.appendChild(titanCard);
-                    dashboardGrid.appendChild(atlasCard);
-                }
-                
-            } catch (error) {
-                console.error('Error loading enhanced metrics:', error);
-            }
-        }
-
-
-        // Chat functionality
-        async function loadChatModels() {
-            try {
-                const response = await fetch(`${API_BASE}/api/available-models`);
-                const models = await response.json();
-                
-                const selector = document.getElementById('modelSelector');
-                if (selector) {
-                    selector.innerHTML = '<option value="">Select a trained model...</option>';
-                    models.forEach(model => {
-                        const option = document.createElement('option');
-                        option.value = model.id;
-                        option.textContent = `${model.name} (${model.repository}) - ${(model.accuracy * 100).toFixed(1)}% accuracy`;
-                        selector.appendChild(option);
-                    });
-                }
-            } catch (error) {
-                console.error('Error loading chat models:', error);
-            }
-        }
-
-        async function sendChatMessage() {
-            const chatInput = document.getElementById('chatInput');
-            const chatMessages = document.getElementById('chatMessages');
-            const sendButton = document.getElementById('sendButton');
-            const modelSelector = document.getElementById('modelSelector');
-            
-            if (!chatInput || !chatMessages || !sendButton) return;
-            
-            const message = chatInput.value.trim();
-            if (!message) return;
-            
-            // Add user message
-            const userDiv = document.createElement('div');
-            userDiv.style.cssText = 'background: #4f46e5; color: white; padding: 12px; border-radius: 10px; margin-bottom: 10px; margin-left: 20%; text-align: right;';
-            userDiv.textContent = message;
-            chatMessages.appendChild(userDiv);
-            
-            // Clear input and disable button
-            chatInput.value = '';
-            sendButton.disabled = true;
-            sendButton.textContent = '🤔 Thinking...';
-            
-            // Add loading message
-            const loadingDiv = document.createElement('div');
-            loadingDiv.style.cssText = 'background: #f0f0f0; padding: 12px; border-radius: 10px; margin-bottom: 10px; margin-right: 20%;';
-            loadingDiv.textContent = '💭 Processing your request...';
-            chatMessages.appendChild(loadingDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-            
-            try {
-                const selectedModel = modelSelector ? modelSelector.value : '';
-                
-                const response = await fetch(`${API_BASE}/api/chat`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        message: message,
-                        model_id: selectedModel ? parseInt(selectedModel) : null,
-                        context: 'web_demo'
-                    })
-                });
-                
-                const result = await response.json();
-                
-                // Remove loading message
-                chatMessages.removeChild(loadingDiv);
-                
-                // Add assistant response
-                const responseDiv = document.createElement('div');
-                responseDiv.style.cssText = 'background: #10b981; color: white; padding: 12px; border-radius: 10px; margin-bottom: 10px; margin-right: 20%;';
-                
-                // Format the response (replace \\n with actual line breaks)
-                let formattedResponse = result.response
-                    .replace(/\\n/g, '\n')
-                    .replace(/```python\n([\s\S]*?)```/g, '<pre style="background: rgba(0,0,0,0.7); color: #00ff00; padding: 10px; border-radius: 5px; margin: 10px 0; overflow-x: auto;"><code>$1</code></pre>');
-                
-                responseDiv.innerHTML = formattedResponse;
-                chatMessages.appendChild(responseDiv);
-                
-                // Add metrics
-                const metricsDiv = document.createElement('div');
-                metricsDiv.style.cssText = 'font-size: 0.8em; color: #666; margin-bottom: 15px; text-align: right;';
-                metricsDiv.textContent = `⚡ ${result.metrics.processing_time_ms}ms • 🎯 ${(result.metrics.confidence * 100).toFixed(0)}% confidence`;
-                chatMessages.appendChild(metricsDiv);
-                
-            } catch (error) {
-                chatMessages.removeChild(loadingDiv);
-                
-                const errorDiv = document.createElement('div');
-                errorDiv.style.cssText = 'background: #ef4444; color: white; padding: 12px; border-radius: 10px; margin-bottom: 10px; margin-right: 20%;';
-                errorDiv.textContent = `❌ Error: ${error.message}`;
-                chatMessages.appendChild(errorDiv);
-            }
-            
-            // Re-enable button
-            sendButton.disabled = false;
-            sendButton.textContent = '💬 Send';
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        // Enter key support for chat
-        document.addEventListener('DOMContentLoaded', function() {
-            const chatInput = document.getElementById('chatInput');
-            if (chatInput) {
-                chatInput.addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        sendChatMessage();
-                    }
-                });
-            }
-            
-            // Load available models
-            loadChatModels();
-        });
-
         
         // State management
         let isDemo = false;
@@ -871,10 +715,7 @@
         }, 5000);
 
         // Initialize on load
-cat /tmp/chat_functions.js
         document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
-        // Load chat models on page load
-        setTimeout(loadChatModels, 1000);
 </html>
