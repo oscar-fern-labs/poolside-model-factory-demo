@@ -68,3 +68,40 @@ Built as a technical demonstration of modern ML infrastructure patterns and cont
 ---
 
 **License**: MIT | **Created**: October 2025 | **Status**: ✅ Complete & Deployed
+
+## 🆕 Latest Enhancements
+
+### 🤖 Interactive LLM Playground
+- **Chat Interface**: Interactive conversations with trained CodeLLM models
+- **Model Selection**: Choose from specialized models based on repository training data
+- **Real-time Metrics**: Response time, confidence scores, and detailed processing metrics
+- **Code Capabilities**: Generate functions, explain algorithms, debug code, optimize solutions
+- **Smart Context**: Models provide repository-specific insights and coding best practices
+
+### 📊 Advanced Performance Analytics
+- **Titan Training Metrics**: GPU cluster utilization, distributed training efficiency, memory usage
+- **Atlas Inference Analytics**: Request throughput, latency distribution, cache performance
+- **Data Pipeline Insights**: Processing accuracy, deduplication rates, quality scores
+- **System Health Dashboard**: Uptime tracking, error rates, availability monitoring
+- **Real-time Visualization**: Live charts and performance trends
+
+### 🎯 Enhanced API Endpoints
+- `POST /api/chat` - Interactive LLM conversations with model selection
+- `GET /api/available-models` - List of trained models ready for interaction
+- `GET /api/metrics/performance` - Comprehensive system performance data
+- `GET /api/experiments/{id}/metrics` - Detailed training metrics and evaluation scores
+
+### 💬 LLM Chat Examples
+```bash
+# Chat with a trained model
+curl -X POST https://backend-morphvm-1y1tpw5s.http.cloud.morph.so/api/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Write a Python function for binary search", "model_id": 1}'
+
+# Get available models
+curl https://backend-morphvm-1y1tpw5s.http.cloud.morph.so/api/available-models
+
+# Get performance metrics
+curl https://backend-morphvm-1y1tpw5s.http.cloud.morph.so/api/metrics/performance
+```
+
